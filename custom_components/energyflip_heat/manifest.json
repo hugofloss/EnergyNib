@@ -1,12 +1,12 @@
 {
   "domain": "energyflip_heat",
   "name": "EnergyFlip Warmte",
-  "codeowners": [],
+  "codeowners": ["@hugofloss"],
   "config_flow": true,
-  "dependencies": [
-    "recorder"
-  ],
+  "dependencies": ["recorder"],
+  "documentation": "https://github.com/hugofloss/EnergyNib",
   "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/hugofloss/EnergyNib/issues",
   "requirements": [],
   "version": "0.1.0"
 }
