@@ -1,4 +1,4 @@
-# EnergyFlip Warmte voor Home Assistant
+# EnergyNib voor Home Assistant
 
 Custom integratie die je warmteverbruik (stadsverwarming) uit [EnergyFlip](https://web.energyflip.com)
 ophaalt en als **langetermijnstatistiek met de juiste tijdstempels** in Home Assistant zet,
@@ -11,7 +11,7 @@ zodat het correct in het energiedashboard verschijnt, ook als EnergyFlip de data
 - Haalt elk uur het warmteverbruik per uur op (`/user/v4/customers/{id}/measurements/cumulativeHistory?views=heat`).
   Bij de eerste keer wordt bepaald of je meter uurdata levert; zo niet, dan worden dagwaarden gebruikt.
   Die keuze wordt opgeslagen en daarna niet meer gewijzigd (uur- en dagwaarden mengen verstoort de totalen).
-- Importeert dit als externe statistiek `energyflip_heat:<customerid>_heat` (eenheid GJ).
+- Importeert dit als externe statistiek `energynib:<customerid>_heat` (eenheid GJ).
   De laatste 3 dagen worden elke keer opnieuw geïmporteerd, zodat late metingen alsnog goed terechtkomen.
 - Eerste keer: importeert standaard 365 dagen historie (aan te passen via *Configureren*, alleen vóór de eerste import).
 - Sensoren (informatief): *Warmteverbruik laatste dag* en *Laatste meting*.
@@ -32,15 +32,15 @@ Klopt iets niet, dan staan de ruwe responses in `probe-output/` (bevatten persoo
 
 ## Stap 2: installeren
 
-**Handmatig:** kopieer `custom_components/energyflip_heat/` naar `<HA-config>/custom_components/`
+**Handmatig:** kopieer `custom_components/energynib/` naar `<HA-config>/custom_components/`
 (bijv. via de Samba- of SSH-add-on) en herstart Home Assistant.
 
 **Via HACS:** zet deze map in een (privé) GitHub-repo, voeg die toe als *Custom repository*
-(type *Integration*) en installeer *EnergyFlip Warmte*.
+(type *Integration*) en installeer *EnergyNib*.
 
 ## Stap 3: instellen
 
-1. *Instellingen → Apparaten & diensten → Integratie toevoegen → EnergyFlip Warmte*.
+1. *Instellingen → Apparaten & diensten → Integratie toevoegen → EnergyNib*.
 2. Log in met je EnergyFlip-account.
 3. Wacht tot de eerste import klaar is (zie *Ontwikkelaarstools → Statistieken*).
 4. *Instellingen → Dashboards → Energie → Gasverbruik → Gasbron toevoegen* en kies
@@ -51,7 +51,7 @@ Klopt iets niet, dan staan de ruwe responses in `probe-output/` (bevatten persoo
 ```yaml
 logger:
   logs:
-    custom_components.energyflip_heat: debug
+    custom_components.energynib: debug
 ```
 
 ## Kanttekeningen

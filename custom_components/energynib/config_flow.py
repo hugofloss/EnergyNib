@@ -1,4 +1,4 @@
-"""Config flow for EnergyFlip Warmte."""
+"""Config flow for EnergyNib."""
 
 from __future__ import annotations
 

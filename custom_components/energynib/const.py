@@ -1,8 +1,8 @@
-"""Constants for the EnergyFlip Warmte integration."""
+"""Constants for the EnergyNib integration."""
 
 from datetime import timedelta
 
-DOMAIN = "energyflip_heat"
+DOMAIN = "energynib"
 
 API_URL = "https://api.aurumeurope.com"
 OAUTH_CLIENT_ID = "b58efc0b"

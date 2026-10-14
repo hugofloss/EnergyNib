@@ -19,21 +19,21 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-PKG_DIR = ROOT / "custom_components" / "energyflip_heat"
+PKG_DIR = ROOT / "custom_components" / "energynib"
 OUT = ROOT / "probe-output"
 
 
 def _load_client_module():
     """Import api.py without the HA-dependent package __init__."""
-    pkg = types.ModuleType("energyflip_heat")
+    pkg = types.ModuleType("energynib")
     pkg.__path__ = [str(PKG_DIR)]
-    sys.modules["energyflip_heat"] = pkg
+    sys.modules["energynib"] = pkg
     for name in ("const", "api"):
-        spec = importlib.util.spec_from_file_location(f"energyflip_heat.{name}", PKG_DIR / f"{name}.py")
+        spec = importlib.util.spec_from_file_location(f"energynib.{name}", PKG_DIR / f"{name}.py")
         mod = importlib.util.module_from_spec(spec)
         sys.modules[spec.name] = mod
         spec.loader.exec_module(mod)
-    return sys.modules["energyflip_heat.api"]
+    return sys.modules["energynib.api"]
 
 
 def _save(name: str, data) -> None:

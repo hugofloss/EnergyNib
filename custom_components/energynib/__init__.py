@@ -1,4 +1,4 @@
-"""EnergyFlip Warmte: heat usage from EnergyFlip in the Home Assistant energy dashboard."""
+"""EnergyNib: heat usage from EnergyFlip in the Home Assistant energy dashboard."""
 
 from __future__ import annotations
 
