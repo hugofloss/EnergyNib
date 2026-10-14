@@ -10,7 +10,7 @@ from __future__ import annotations
 import asyncio
 import time
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Any
 from urllib.parse import quote
 from zoneinfo import ZoneInfo
@@ -101,6 +101,7 @@ class EnergyFlipClient:
         self._expires_at = 0.0
         self.customer_id: str | None = None
         self.sources: dict[str, str] = {}
+        self.initial_measurements_date: date | None = None
 
     async def _token_request(self, data: dict[str, str]) -> None:
         try:
@@ -200,6 +201,12 @@ class EnergyFlipClient:
             raise EnergyFlipError(f"Unexpected customer overview: {err!r}") from err
         self.customer_id = customer_id
         self.sources = sources
+        try:
+            self.initial_measurements_date = date.fromisoformat(
+                str(summary.get("initialMeasurementsDate"))[:10]
+            )
+        except ValueError:
+            self.initial_measurements_date = None
         return body
 
     async def cumulative_history_raw(

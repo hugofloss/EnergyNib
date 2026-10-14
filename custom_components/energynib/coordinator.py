@@ -113,7 +113,7 @@ class EnergyFlipHeatCoordinator(DataUpdateCoordinator[HeatData]):
     async def _detect_resolution(self) -> bool:
         """Pick hourly data if the meter has it, else daily, and store the choice for good."""
         end = dt_util.now()
-        start = end - DETECT_WINDOW
+        start = self._clamp(end - DETECT_WINDOW)
         try:
             hourly = await self.client.heat_history(start, end, RESOLUTION_HOUR)
         except EnergyFlipAuthError:
@@ -136,12 +136,21 @@ class EnergyFlipHeatCoordinator(DataUpdateCoordinator[HeatData]):
         )
         return True
 
+    def _clamp(self, start: datetime) -> datetime:
+        """Never ask for data before the first measurement; the API may error on that."""
+        first = self.client.initial_measurements_date
+        if first is None:
+            return start
+        first_dt = dt_util.start_of_local_day(first)
+        return max(start, first_dt)
+
     async def _fetch(self, start: datetime, end: datetime) -> list[HeatPoint]:
         """Fetch in chunks; deduplicate per interval in case chunk boundaries overlap."""
         by_start: dict[datetime, HeatPoint] = {}
-        chunk_start = start
+        chunk = FETCH_CHUNK[self.resolution]
+        chunk_start = self._clamp(start)
         while chunk_start < end:
-            chunk_end = min(chunk_start + FETCH_CHUNK, end)
+            chunk_end = min(chunk_start + chunk, end)
             for point in await self.client.heat_history(chunk_start, chunk_end, self.resolution):
                 point.start = point.start.replace(minute=0, second=0, microsecond=0)
                 by_start[point.start] = point

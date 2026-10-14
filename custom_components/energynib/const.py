@@ -25,7 +25,8 @@ REFETCH_WINDOW = timedelta(days=3)
 CONF_RESOLUTION = "resolution"
 RESOLUTION_HOUR = "hour1"
 RESOLUTION_DAY = "day1"
-DETECT_WINDOW = timedelta(days=14)
+DETECT_WINDOW = timedelta(days=2)
 
-# Maximum period requested per API call.
-FETCH_CHUNK = timedelta(days=31)
+# Maximum period requested per API call. The API answers 500 to long hourly
+# ranges; the web app itself requests hourly data one day at a time.
+FETCH_CHUNK = {RESOLUTION_HOUR: timedelta(days=1), RESOLUTION_DAY: timedelta(days=31)}
