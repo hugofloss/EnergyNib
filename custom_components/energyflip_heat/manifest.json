@@ -1,0 +1,12 @@
+{
+  "domain": "energyflip_heat",
+  "name": "EnergyFlip Warmte",
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": [
+    "recorder"
+  ],
+  "iot_class": "cloud_polling",
+  "requirements": [],
+  "version": "0.1.0"
+}

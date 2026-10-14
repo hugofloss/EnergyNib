@@ -1,0 +1,38 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "EnergyFlip",
+        "description": "Log in with the same account you use on web.energyflip.com.",
+        "data": {"username": "E-mail address", "password": "Password"}
+      },
+      "reauth_confirm": {
+        "title": "EnergyFlip",
+        "description": "The EnergyFlip login no longer works. Enter your password again.",
+        "data": {"password": "Password"}
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid e-mail address or password.",
+      "cannot_connect": "Could not connect to EnergyFlip.",
+      "no_heat_source": "This EnergyFlip account has no heat meter."
+    },
+    "abort": {
+      "already_configured": "This account is already configured.",
+      "reauth_successful": "Login updated."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {"backfill_days": "Days of history to import on first run"}
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "last_day_usage": {"name": "Heat usage last day"},
+      "last_measurement": {"name": "Last measurement"}
+    }
+  }
+}
