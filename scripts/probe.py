@@ -50,10 +50,14 @@ async def main() -> None:
 
     async with aiohttp.ClientSession() as session:
         client = api.EnergyFlipClient(session, username, password)
-        await client.login()
-        print("✓ Ingelogd")
-
-        overview = await client.customer_overview()
+        try:
+            await client.login()
+            print("✓ Ingelogd")
+            overview = await client.customer_overview()
+        except api.EnergyFlipAuthError:
+            sys.exit("✗ Inloggen mislukt: controleer e-mailadres en wachtwoord.")
+        except api.EnergyFlipError as err:
+            sys.exit(f"✗ EnergyFlip niet bereikbaar of onverwacht antwoord: {err}")
         _save("overview", overview)
         print(f"✓ Customer id: {client.customer_id}")
         print(f"  Bronnen: {', '.join(sorted(client.sources)) or '(geen)'}")
@@ -69,7 +73,11 @@ async def main() -> None:
                 print(f"✗ {resolution}: {err}")
                 continue
             _save(f"heat_{resolution}", raw)
-            points = await client.heat_history(start, now, resolution)
+            try:
+                points = api.parse_heat_points(raw)
+            except api.EnergyFlipError as err:
+                print(f"✗ {resolution}: kan antwoord niet verwerken: {err}")
+                continue
             print(f"\n{resolution}: {len(points)} waarden met data")
             for p in points[-8:]:
                 print(f"  {p.start.isoformat()}  {p.value:.4f} {p.unit}")

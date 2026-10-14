@@ -31,7 +31,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: EnergyFlipHeatConfigEntr
 
 
 async def _async_reload(hass: HomeAssistant, entry: EnergyFlipHeatConfigEntry) -> None:
-    await hass.config_entries.async_reload(entry.entry_id)
+    # Data updates (stored resolution, reauth) must not trigger a reload; reauth reloads itself.
+    if dict(entry.options) != entry.runtime_data.options:
+        await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: EnergyFlipHeatConfigEntry) -> bool:

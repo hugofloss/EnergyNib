@@ -20,5 +20,12 @@ DEFAULT_BACKFILL_DAYS = 365
 # to pick up hours that were empty or incomplete during a previous poll.
 REFETCH_WINDOW = timedelta(days=3)
 
+# Interval of the data ("hour1" or "day1"). Detected once and stored in the
+# config entry, because mixing resolutions in one statistic breaks the sums.
+CONF_RESOLUTION = "resolution"
+RESOLUTION_HOUR = "hour1"
+RESOLUTION_DAY = "day1"
+DETECT_WINDOW = timedelta(days=14)
+
 # Maximum period requested per API call.
 FETCH_CHUNK = timedelta(days=31)

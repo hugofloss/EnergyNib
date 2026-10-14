@@ -4,12 +4,17 @@
       "user": {
         "title": "EnergyFlip",
         "description": "Log in met hetzelfde account als op web.energyflip.com.",
-        "data": {"username": "E-mailadres", "password": "Wachtwoord"}
+        "data": {
+          "username": "E-mailadres",
+          "password": "Wachtwoord"
+        }
       },
       "reauth_confirm": {
         "title": "EnergyFlip",
         "description": "Inloggen bij EnergyFlip lukt niet meer. Vul je wachtwoord opnieuw in.",
-        "data": {"password": "Wachtwoord"}
+        "data": {
+          "password": "Wachtwoord"
+        }
       }
     },
     "error": {
@@ -25,14 +30,24 @@
   "options": {
     "step": {
       "init": {
-        "data": {"backfill_days": "Aantal dagen historie om bij de eerste keer te importeren"}
+        "data": {
+          "backfill_days": "Aantal dagen historie om bij de eerste keer te importeren"
+        },
+        "description": "Deze instelling werkt alleen bij de eerste import, zolang er nog geen warmtestatistiek bestaat. Wil je later meer historie, verwijder dan de statistiek via Ontwikkelaarstools → Statistieken en herlaad de integratie.",
+        "data_description": {
+          "backfill_days": "Alleen van toepassing bij de eerste import."
+        }
       }
     }
   },
   "entity": {
     "sensor": {
-      "last_day_usage": {"name": "Warmteverbruik laatste dag"},
-      "last_measurement": {"name": "Laatste meting"}
+      "last_day_usage": {
+        "name": "Warmteverbruik laatste dag"
+      },
+      "last_measurement": {
+        "name": "Laatste meting"
+      }
     }
   }
 }

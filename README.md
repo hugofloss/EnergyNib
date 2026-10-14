@@ -9,10 +9,11 @@ zodat het correct in het energiedashboard verschijnt, ook als EnergyFlip de data
 - Logt in op dezelfde (ongedocumenteerde) API als de webapp: `api.aurumeurope.com`,
   OAuth2 password grant + refresh token.
 - Haalt elk uur het warmteverbruik per uur op (`/user/v4/customers/{id}/measurements/cumulativeHistory?views=heat`).
-  Levert de meter geen uurdata, dan valt hij automatisch terug op dagwaarden.
+  Bij de eerste keer wordt bepaald of je meter uurdata levert; zo niet, dan worden dagwaarden gebruikt.
+  Die keuze wordt opgeslagen en daarna niet meer gewijzigd (uur- en dagwaarden mengen verstoort de totalen).
 - Importeert dit als externe statistiek `energyflip_heat:<customerid>_heat` (eenheid GJ).
   De laatste 3 dagen worden elke keer opnieuw geïmporteerd, zodat late metingen alsnog goed terechtkomen.
-- Eerste keer: importeert standaard 365 dagen historie (aan te passen via *Configureren*).
+- Eerste keer: importeert standaard 365 dagen historie (aan te passen via *Configureren*, alleen vóór de eerste import).
 - Sensoren (informatief): *Warmteverbruik laatste dag* en *Laatste meting*.
 
 ## Stap 1: eerst testen met je account (aanbevolen)

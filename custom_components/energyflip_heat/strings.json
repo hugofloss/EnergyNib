@@ -4,12 +4,17 @@
       "user": {
         "title": "EnergyFlip",
         "description": "Log in with the same account you use on web.energyflip.com.",
-        "data": {"username": "E-mail address", "password": "Password"}
+        "data": {
+          "username": "E-mail address",
+          "password": "Password"
+        }
       },
       "reauth_confirm": {
         "title": "EnergyFlip",
         "description": "The EnergyFlip login no longer works. Enter your password again.",
-        "data": {"password": "Password"}
+        "data": {
+          "password": "Password"
+        }
       }
     },
     "error": {
@@ -25,14 +30,24 @@
   "options": {
     "step": {
       "init": {
-        "data": {"backfill_days": "Days of history to import on first run"}
+        "data": {
+          "backfill_days": "Days of history to import on first run"
+        },
+        "description": "This only applies to the first import, while no heat statistic exists yet. For more history later, delete the statistic under Developer tools → Statistics and reload the integration.",
+        "data_description": {
+          "backfill_days": "Only used for the first import."
+        }
       }
     }
   },
   "entity": {
     "sensor": {
-      "last_day_usage": {"name": "Heat usage last day"},
-      "last_measurement": {"name": "Last measurement"}
+      "last_day_usage": {
+        "name": "Heat usage last day"
+      },
+      "last_measurement": {
+        "name": "Last measurement"
+      }
     }
   }
 }

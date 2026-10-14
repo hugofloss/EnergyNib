@@ -18,15 +18,19 @@ from homeassistant.const import UnitOfEnergy
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from homeassistant.util import dt as dt_util
+from homeassistant.util import dt as dt_util, slugify
 
 from .api import EnergyFlipAuthError, EnergyFlipClient, EnergyFlipError, HeatPoint
 from .const import (
     CONF_BACKFILL_DAYS,
+    CONF_RESOLUTION,
     DEFAULT_BACKFILL_DAYS,
+    DETECT_WINDOW,
     DOMAIN,
     FETCH_CHUNK,
     REFETCH_WINDOW,
+    RESOLUTION_DAY,
+    RESOLUTION_HOUR,
     UPDATE_INTERVAL,
 )
 
@@ -82,38 +86,67 @@ class EnergyFlipHeatCoordinator(DataUpdateCoordinator[HeatData]):
             update_interval=UPDATE_INTERVAL,
         )
         self.client = client
-        self.resolution = "hour1"
+        # Options this instance was set up with; the update listener reloads only when they change.
+        self.options = dict(entry.options)
 
     @property
     def statistic_id(self) -> str:
-        return f"{DOMAIN}:{self.client.customer_id}_heat".lower()
+        return f"{DOMAIN}:{slugify(str(self.client.customer_id))}_heat"
+
+    @property
+    def resolution(self) -> str | None:
+        return self.config_entry.data.get(CONF_RESOLUTION)
 
     async def _async_update_data(self) -> HeatData:
         try:
             if self.client.customer_id is None:
                 await self.client.customer_overview()
+            if self.resolution is None and not await self._detect_resolution():
+                _LOGGER.debug("No heat data available yet")
+                return self._summary(None)
             return await self._import_statistics()
         except EnergyFlipAuthError as err:
             raise ConfigEntryAuthFailed(str(err)) from err
         except EnergyFlipError as err:
             raise UpdateFailed(str(err)) from err
 
+    async def _detect_resolution(self) -> bool:
+        """Pick hourly data if the meter has it, else daily, and store the choice for good."""
+        end = dt_util.now()
+        start = end - DETECT_WINDOW
+        try:
+            hourly = await self.client.heat_history(start, end, RESOLUTION_HOUR)
+        except EnergyFlipAuthError:
+            raise
+        except EnergyFlipError as err:
+            # Only a client error means "not supported"; anything else may be transient.
+            if err.status is None or not 400 <= err.status < 500:
+                raise
+            hourly = []
+        if hourly:
+            resolution = RESOLUTION_HOUR
+        elif await self.client.heat_history(start, end, RESOLUTION_DAY):
+            resolution = RESOLUTION_DAY
+        else:
+            return False
+
+        _LOGGER.info("Using heat data resolution %s", resolution)
+        self.hass.config_entries.async_update_entry(
+            self.config_entry, data={**self.config_entry.data, CONF_RESOLUTION: resolution}
+        )
+        return True
+
     async def _fetch(self, start: datetime, end: datetime) -> list[HeatPoint]:
-        points: list[HeatPoint] = []
+        """Fetch in chunks; deduplicate per interval in case chunk boundaries overlap."""
+        by_start: dict[datetime, HeatPoint] = {}
         chunk_start = start
         while chunk_start < end:
             chunk_end = min(chunk_start + FETCH_CHUNK, end)
-            try:
-                points += await self.client.heat_history(chunk_start, chunk_end, self.resolution)
-            except EnergyFlipError:
-                if self.resolution != "hour1":
-                    raise
-                # Some heat meters only deliver daily values.
-                _LOGGER.warning("Hourly heat data not available, falling back to daily values")
-                self.resolution = "day1"
-                continue
+            for point in await self.client.heat_history(chunk_start, chunk_end, self.resolution):
+                point.start = point.start.replace(minute=0, second=0, microsecond=0)
+                by_start[point.start] = point
             chunk_start = chunk_end
-        return points
+        return sorted(by_start.values(), key=lambda p: p.start)
 
     async def _import_statistics(self) -> HeatData:
         statistic_id = self.statistic_id
@@ -166,7 +199,7 @@ class EnergyFlipHeatCoordinator(DataUpdateCoordinator[HeatData]):
             running += point.value * factor
             statistics.append(
                 StatisticData(
-                    start=point.start.replace(minute=0, second=0, microsecond=0),
+                    start=point.start,
                     state=point.value * factor,
                     sum=running,
                 )
